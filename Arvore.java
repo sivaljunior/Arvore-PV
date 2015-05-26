@@ -41,7 +41,7 @@ class Arvore{
 		while(z.pai != null && z.pai.cor){
 			if(z.pai == z.pai.pai.esq){
 				y = z.pai.pai.dir;
-				if(y.cor){
+				if(y != null && y.cor){
 					z.pai.cor = false;
 					y.cor = false;
 					z.pai.pai.cor = true;
@@ -57,7 +57,7 @@ class Arvore{
 				}
 			} else {
 				y = z.pai.pai.esq;
-				if(y.cor){
+				if(y != null && y.cor){
 					z.pai.cor = false;
 					y.cor = false;
 					z.pai.pai.cor = true;
@@ -84,6 +84,7 @@ class Arvore{
 	}
 	
 	public void delete(Nodo z){
+		if(z == null) return;
 		Nodo y = z, x;
 		boolean yCorOriginal = y.cor;
 		if(z.esq == null){
@@ -164,6 +165,26 @@ class Arvore{
 			}
 		}
 		x.cor = false;
+	}
+	
+	public Nodo encontra(int k){
+		Nodo a = raiz.busca(k);
+		if(a.info != k) return null;
+		else return a;
+	}
+	
+	public Arvore acha_50(int chave) {
+		Contador counter = new Contador(0);
+		Arvore aux = new Arvore(chave);
+		this.raiz.cinquenta(counter, chave, aux);
+		return aux;
+	}
+	
+	public void graph() {
+		System.out.println("digraph RBTree {");
+		raiz.graph();
+		System.out.println("\tnil [style = filled, fillcolor = black, fontcolor = white];");
+		System.out.println("}");
 	}
 	
 }
