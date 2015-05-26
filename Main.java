@@ -24,6 +24,7 @@ class Main{
 		tree.graph();
 		
 		/*
+		tree.acha_50(valor);
 		tree.delete(encontra(valor));
 		 */
 		
