@@ -23,8 +23,8 @@ class Nodo{
 	}
 	
 	public Nodo busca(int k){
-		if(K > info && dir != null) return dir.busca(k);
-		if(K < info && esq != null) return esq.busca(k);
+		if(k > info && dir != null) return dir.busca(k);
+		if(k < info && esq != null) return esq.busca(k);
 		return this;
 	}
 	
