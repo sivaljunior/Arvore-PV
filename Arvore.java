@@ -1,9 +1,10 @@
 class Arvore{
 
 	Nodo raiz;
+	static Nodo nil = new Nodo();
 	
 	public Arvore(){
-		raiz = null;
+		raiz = Arvore.nil;
 	}
 
 	public Arvore(int k){
@@ -11,20 +12,25 @@ class Arvore{
 	}
 	
 	public void add(int k){
-		if(raiz == null) raiz = new Nodo(k);
+		if(raiz == Arvore.nil) raiz = new Nodo(k);
 		else{
 			Nodo aux = raiz.busca(k);
-			if(k > aux.info) addFix(aux.dir = new Nodo(k, aux));
-			if(k < aux.info) addFix(aux.esq = new Nodo(k, aux));
+			if(k > aux.info){
+				aux.dir = new Nodo(k, aux);
+				addFix(aux.dir);
+			} else if(k < aux.info){
+				aux.esq = new Nodo(k, aux);
+				addFix(aux.esq);
+			}
 		}
 	}
 	
 	public void left_rotate(Nodo x){
 		Nodo y = x.dir;
 		x.dir = y.esq;
-		if(y.esq != null) y.esq.pai = x;
+		if(y.esq != Arvore.nil) y.esq.pai = x;
 		y.pai = x.pai;
-		if(x.pai == null) raiz = y;
+		if(x.pai == Arvore.nil) raiz = y;
 		else if(x == x.pai.esq) x.pai.esq = y;
 		else x.pai.dir = y;
 		y.esq = x;
@@ -34,21 +40,21 @@ class Arvore{
 	public void right_rotate(Nodo x){
 		Nodo y = x.esq;
 		x.esq = y.dir;
-		if(y.dir != null) y.dir.pai = x;
+		if(y.dir != Arvore.nil) y.dir.pai = x;
 		y.pai = x.pai;
-		if(x.pai == null) raiz = y;
-		else if(x == x.pai.dir) x.pai.dir = y;
-		else x.pai.esq = y;
+		if(x.pai == Arvore.nil) raiz = y;
+		else if(x == x.pai.esq) x.pai.esq = y;
+		else x.pai.dir = y;
 		y.dir = x;
 		x.pai = y;	
 	}
 
 	public void addFix(Nodo z){
 		Nodo y;
-		while(z.pai != null && z.pai.cor){
+		while(z.pai.cor){
 			if(z.pai == z.pai.pai.esq){
 				y = z.pai.pai.dir;
-				if(y != null && y.cor){
+				if(y.cor){
 					z.pai.cor = false;
 					y.cor = false;
 					z.pai.pai.cor = true;
@@ -64,7 +70,7 @@ class Arvore{
 				}
 			} else {
 				y = z.pai.pai.esq;
-				if(y != null && y.cor){
+				if(y.cor){
 					z.pai.cor = false;
 					y.cor = false;
 					z.pai.pai.cor = true;
@@ -80,34 +86,34 @@ class Arvore{
 				}
 			}			
 		}
-		if(raiz != null) raiz.cor = false;		
+		raiz.cor = false;		
 	}
 	
 	public void transplant(Nodo u, Nodo v){
-		if(u.pai == null) raiz = v;
+		if(u.pai == Arvore.nil) raiz = v;
 		else if(u == u.pai.esq) u.pai.esq = v;
 		else u.pai.dir = v;
-		if (v != null) v.pai = u.pai;
+		v.pai = u.pai;
 	}
 	
 	public void delete(Nodo z){
 		Nodo y = z, x;
 		boolean yCorOriginal = y.cor;
-		if(z.esq == null){
+		if(z.esq == Arvore.nil){
 			x = z.dir;
 			transplant(z, z.dir);
-		} else if(z.dir == null){
+		} else if(z.dir == Arvore.nil){
 			x = z.esq;
 			transplant(z, z.esq);
 		} else {
 			y = z.dir.minimo();
 			yCorOriginal = y.cor;
 			x = y.dir;
-			if(y != null && x != null && y.pai == z) x.pai = y;
-			else if(y != null){
+			if(y.pai == z) x.pai = y;
+			else {
 				transplant(y, y.dir);
 				y.dir = z.dir;
-				if(y.dir != null) y.dir.pai = y;
+				y.dir.pai = y;
 			}
 			transplant(z, y);
 			y.esq = z.esq;
@@ -119,7 +125,7 @@ class Arvore{
 	
 	public void delFix(Nodo x){
 		Nodo w;
-		while(x != null && x != raiz && x.cor == false){
+		while(x != raiz && x.cor == false){
 			if(x == x.pai.esq){
 				w = x.pai.dir;
 				if(w.cor){
@@ -138,12 +144,12 @@ class Arvore{
 						right_rotate(w);
 						w = x.pai.dir;
 					}
+					w.cor = x.pai.cor;
+					x.pai.cor = false;
+					w.dir.cor = false;
+					left_rotate(x.pai);
+					x = raiz;
 				}
-				w.cor = x.pai.cor;
-				x.pai.cor = false;
-				w.dir.cor = false;
-				left_rotate(x.pai);
-				x = raiz;
 			} else {
 				w = x.pai.esq;
 				if(w.cor){
@@ -162,21 +168,20 @@ class Arvore{
 						left_rotate(w);
 						w = x.pai.esq;
 					}
+					w.cor = x.pai.cor;
+					x.pai.cor = false;
+					w.esq.cor = false;
+					right_rotate(x.pai);
+					x = raiz;
 				}
-				w.cor = x.pai.cor;
-				x.pai.cor = false;
-				w.esq.cor = false;
-				right_rotate(x.pai);
-				x = raiz;
 			}
 		}
-		if(x != null) x.cor = false;
+		x.cor = false;
 	}
 	
 	public Nodo encontra(int k){
 		Nodo a = raiz.busca(k);
-		if(a.info != k) return null;
-		else return a;
+		return a;
 	}
 	
 	public Arvore acha_50(int chave) {
